@@ -127,7 +127,7 @@ export default class Draw {
 
     /**
      * 
-     * @type {'limet'} key  
+     * @type {"limit"} key 
      * @param {Function} fun 
      */
     removeEventListener(key, fun) {
@@ -138,6 +138,11 @@ export default class Draw {
         }
     }
 
+    /**
+     * 
+     * @type {"limit"} key 
+     * @param {Function} fun 
+     */
     runEventListener() {
         const { eventMap } = this;
         eventMap.forEach(eventList => {
@@ -146,9 +151,29 @@ export default class Draw {
     }
 
 
+    /**
+     * @description 注册事件
+     */
     registeredEvents() {
 
-        const docMove = (e) => {
+        const down = (e) => {
+            if (this.maxLength !== 0 && this.mapList.length >= this.maxLength) {
+                this.runEventListener();
+                document.removeEventListener('mousedown', down)
+                return
+            }
+            // 记录按下坐标
+            const { left, top } = this.canvasDom.getBoundingClientRect();
+            const startX = e.clientX - left;
+            const startY = e.clientY - top;
+            this.mapPointer.startX = startX
+            this.mapPointer.startY = startY;
+
+            document.addEventListener('mousemove', move)
+            document.addEventListener('mouseup', up)
+        }
+
+        const move = (e) => {
             // 计算移动时的坐标
             const { left, top, width, height } = this.canvasDom.getBoundingClientRect();
             let mouseX = e.clientX - left;
@@ -171,7 +196,7 @@ export default class Draw {
             this.drawStrokeRect(mouseX, mouseY);
         }
 
-        const docUp = () => {
+        const up = () => {
 
             // 当endX，endY 小于 startX，startY则交换位置
             if (this.mapPointer.endX < this.mapPointer.startX) {
@@ -187,28 +212,12 @@ export default class Draw {
             this.mapList.push({
                 ...this.mapPointer
             })
-            document.removeEventListener('mousemove', docMove);
-            document.removeEventListener('mouseup', docUp);
-        }
-
-        const docDown = (e) => {
-            if (this.maxLength !== 0 && this.mapList.length >= this.maxLength) {
-                this.runEventListener();
-                document.removeEventListener('mousedown', docDown)
-                return
-            }
-            // 记录按下坐标
-            const { left, top } = this.canvasDom.getBoundingClientRect();
-            const startX = e.clientX - left;
-            const startY = e.clientY - top;
-            this.mapPointer.startX = startX
-            this.mapPointer.startY = startY;
-
-            document.addEventListener('mousemove', docMove)
-            document.addEventListener('mouseup', docUp)
+            document.removeEventListener('mousemove', move);
+            document.removeEventListener('mouseup', up);
         }
 
 
-        this.canvasDom.addEventListener('mousedown', docDown)
+
+        this.canvasDom.addEventListener('mousedown', down)
     }
 }

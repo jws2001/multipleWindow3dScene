@@ -11,4 +11,4 @@ const fun = () => {
 draw.addEventListener('limit', fun)
 
 
-draw.removeEventListener('limit', fun)
+// draw.removeEventListener('limit', fun)
