@@ -10,5 +10,6 @@ const fun = () => {
 
 draw.addEventListener('limit', fun)
 
-
-// draw.removeEventListener('limit', fun)
+draw.addEventListener('change', e => {
+    console.log(e,'===')
+})
